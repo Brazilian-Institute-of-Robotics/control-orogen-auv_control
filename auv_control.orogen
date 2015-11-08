@@ -349,4 +349,28 @@ task_context "ThrustersInput" do
     port_driven 'cmd_in'                   
 end
 
+task_context "CommandMultiplex" do
+    needs_configuration
 
+    property "names", "std::vector<std::string>"
+
+    dynamic_input_port(/cmd_in_\w+/, "base/samples/Joints")
+
+    output_port("cmd_out", "base/samples/Joints")
+
+    port_driven
+
+end
+
+task_context "CommandDemultiplex" do
+    needs_configuration
+
+    property "names", "std::vector<std::string>"
+
+    dynamic_output_port(/cmd_out_\w+/, "base/samples/Joints")
+
+    input_port("cmd_in", "base/samples/Joints")
+
+    port_driven
+
+end

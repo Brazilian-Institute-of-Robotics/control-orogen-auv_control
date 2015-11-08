@@ -24,6 +24,15 @@ namespace auv_control {
 class CommandMultiplex: public CommandMultiplexBase {
     friend class CommandMultiplexBase;
 protected:
+    std::vector<std::string> names;
+
+    std::map<std::string, RTT::InputPort<base::samples::Joints>* > input_ports;
+
+    bool setupCommandInputPorts();
+
+    bool addCommandInputPort(std::string name);
+
+    void releaseCommandInputPorts();
 
 public:
     /** TaskContext constructor for CommandMultiplex
@@ -41,15 +50,10 @@ public:
     /** Default deconstructor of CommandMultiplex
      */
     ~CommandMultiplex();
+
     bool configureHook();
 
-    bool startHook();
-
     void updateHook();
-
-    void errorHook();
-
-    void stopHook();
 
     void cleanupHook();
 };

@@ -57,13 +57,7 @@ public:
 
     bool configureHook();
 
-    bool startHook();
-
     void updateHook();
-
-    void errorHook();
-
-    void stopHook();
 
     void cleanupHook();
 };

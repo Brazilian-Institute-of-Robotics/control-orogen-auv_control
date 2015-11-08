@@ -18,37 +18,67 @@ CommandMultiplex::~CommandMultiplex()
 {
 }
 
-
-
-/// The following lines are template definitions for the various state machine
-// hooks defined by Orocos::RTT. See CommandMultiplex.hpp for more detailed
-// documentation about them.
-
 bool CommandMultiplex::configureHook()
 {
     if (! CommandMultiplexBase::configureHook())
         return false;
-    return true;
-}
-bool CommandMultiplex::startHook()
-{
-    if (! CommandMultiplexBase::startHook())
+
+
+    names = _names.get();
+
+    if (names.size() == 0){
         return false;
+    }
+
+    if (!setupCommandInputPorts()){
+        return false;
+    }
+
     return true;
 }
+
 void CommandMultiplex::updateHook()
 {
     CommandMultiplexBase::updateHook();
 }
-void CommandMultiplex::errorHook()
-{
-    CommandMultiplexBase::errorHook();
-}
-void CommandMultiplex::stopHook()
-{
-    CommandMultiplexBase::stopHook();
-}
+
 void CommandMultiplex::cleanupHook()
 {
+    releaseCommandInputPorts();
     CommandMultiplexBase::cleanupHook();
+}
+
+bool CommandMultiplex::setupCommandInputPorts()
+{
+    for (size_t i =0; i < names.size(); i++) {
+        if (!addCommandInputPort(names[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool CommandMultiplex::addCommandInputPort(std::string name)
+{
+    if (provides()->hasService("cmd_in_" + name))
+        return false;
+
+    RTT::InputPort<base::samples::Joints> *port = new RTT::InputPort<base::samples::Joints>("cmd_in_" + name);
+    provides()->addPort(*port);
+    input_ports.insert(std::make_pair("cmd_in_" + name, port));
+
+    return true;
+}
+
+void CommandMultiplex::releaseCommandInputPorts()
+{
+    for (std::map<std::string, RTT::InputPort<base::samples::Joints>* >::iterator it = input_ports.begin() ;
+            it != input_ports.end(); it++) {
+        RTT::InputPort<base::samples::Joints> *port = it->second;
+        provides()->removePort(port->getName());
+        delete port;
+    }
+
+    input_ports.clear();
 }

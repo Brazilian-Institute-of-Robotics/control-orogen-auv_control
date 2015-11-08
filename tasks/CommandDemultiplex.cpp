@@ -16,8 +16,6 @@ CommandDemultiplex::~CommandDemultiplex()
 {
 }
 
-
-
 bool CommandDemultiplex::configureHook()
 {
     if (! CommandDemultiplexBase::configureHook())
@@ -30,18 +28,13 @@ bool CommandDemultiplex::configureHook()
         return false;
     }
 
-    setupCommandOutputPorts();
-
-    return true;
-}
-
-
-bool CommandDemultiplex::startHook()
-{
-    if (! CommandDemultiplexBase::startHook())
+    if (!setupCommandOutputPorts()){
         return false;
+    }
+
     return true;
 }
+
 void CommandDemultiplex::updateHook()
 {
     CommandDemultiplexBase::updateHook();
@@ -59,18 +52,11 @@ void CommandDemultiplex::updateHook()
     }
 
 }
-void CommandDemultiplex::errorHook()
-{
-    CommandDemultiplexBase::errorHook();
-}
-void CommandDemultiplex::stopHook()
-{
-    CommandDemultiplexBase::stopHook();
-}
+
 void CommandDemultiplex::cleanupHook()
 {
-    CommandDemultiplexBase::cleanupHook();
     releaseCommandOutputPorts();
+    CommandDemultiplexBase::cleanupHook();
 }
 
 bool CommandDemultiplex::setupCommandOutputPorts()
@@ -118,6 +104,7 @@ bool CommandDemultiplex::writeOutputPortByName(const std::string& port_name, con
     }
 
     base::samples::Joints joints;
+    joints.time = base::Time::now();
     joints.names.push_back(name);
     joints.elements.push_back(elem);
 
